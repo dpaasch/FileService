@@ -13,7 +13,7 @@ public interface FileReaderStrategy<T> {
      *
      * @return dataFilePath : path of the file to be read
      */
-    public abstract String getDataFilePath();
+    public abstract String getFilePath();
 
     /**
      * gets the name of the format strategy to be used
@@ -34,7 +34,7 @@ public interface FileReaderStrategy<T> {
      *
      * @param dataFilePath : path of the file to be read
      */
-    public abstract void setDataFilePath(String filePath);
+    public abstract void setFilePath(String filePath);
 
     /**
      * sets the format strategy that will be used to read the file

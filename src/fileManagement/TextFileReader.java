@@ -20,21 +20,22 @@ public class TextFileReader implements
     private FormatStrategy<List<LinkedHashMap<String, String>>, List<String>> formatter;
     private BufferedReader reader;
     /* TextFileReader variables */
-    private String dataFilePath;// The path of the file being read from
+    private String filePath;// The path of the file being read from
     private String line = null;
     private boolean hasHeader;
     /* TextFileReader message variables */
     private final String NULL_POINTER = " Error: Value cannot be null";
 
     /**
-     * Constructor instantiates the dataFilePath and formatter
+     * Constructor instantiates the class by setting the dataFilePath and 
+     * the appropriate FormatStrategy.
      *
      * @param dataFilePath : path of the file to be read
      * @param formatter
      */
-    public TextFileReader(String dataFilePath, FormatStrategy formatter) {
-        this.dataFilePath = dataFilePath;
-        this.formatter = formatter;
+    public TextFileReader(String filePath, FormatStrategy formatter) {
+        setFilePath(filePath);
+        setFormatter(formatter);
     }
 
     /**
@@ -50,14 +51,14 @@ public class TextFileReader implements
     @Override
     public List<LinkedHashMap<String, String>> readFile() throws IOException {
         // create an array to hold the data from the file
-        List<String> dataFromFile = new ArrayList<String>();
+        List<String> data = new ArrayList<String>();
 
         try {
             reader = new BufferedReader(
-                    new java.io.FileReader(dataFilePath));
+                    new java.io.FileReader(filePath));
             line = reader.readLine();  // A line of data from the file
             while (line != null) {
-                dataFromFile.add(line);
+                data.add(line);
                 line = reader.readLine();
             }
         } catch (IOException e) {
@@ -67,7 +68,7 @@ public class TextFileReader implements
                 reader.close();
             }
         }
-        return formatter.decodeData(dataFromFile);
+        return formatter.decodeData(data);
     }
 
     /**
@@ -76,8 +77,8 @@ public class TextFileReader implements
      * @return dataFilePath : path of the file to be read
      */
     @Override
-    public String getDataFilePath() {
-        return dataFilePath;
+    public String getFilePath() {
+        return filePath;
     }
 
     /**
@@ -87,10 +88,10 @@ public class TextFileReader implements
      * @param dataFilePath : path of the file to be read
      */
     @Override
-    public void setDataFilePath(String dataFilePath) {
+    public void setFilePath(String filePath) {
         try {
-            if (dataFilePath != null || dataFilePath.length() != 0) {
-                this.dataFilePath = dataFilePath;
+            if (filePath != null || filePath.length() != 0) {
+                this.filePath = filePath;
             } else {
                 throw new NullPointerException();
             }
@@ -140,7 +141,7 @@ public class TextFileReader implements
                 new CsvCommaFormat(false));
         List<LinkedHashMap<String, String>> returnData =
                 reader.readFile();
-        System.out.println("Reading file " + reader.getDataFilePath()
+        System.out.println("Reading file " + reader.getFilePath()
                 + "\n\n" + returnData);
 //        JOptionPane.showMessageDialog(null, "Reading file "
 //                + reader.getDataFilePath() + "\n\n" + returnData);

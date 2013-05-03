@@ -1,5 +1,7 @@
 package fileManagement;
 
+import java.util.List;
+
 /**
  *
  * @author Dawn Bykowski, dpaasch@my.wctc.edu
@@ -7,7 +9,7 @@ package fileManagement;
  */
 public interface FormatStrategy<T, E> {
 
-    public abstract T decodeData(E dataFromFile);
+    public abstract T decodeData(E data);
 
-    public abstract String encodeData(T dataFromFile);
+    public abstract List<String> encodeData(T data);
 }
