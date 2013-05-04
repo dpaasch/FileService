@@ -11,5 +11,5 @@ public interface FormatStrategy<T, E> {
 
     public abstract T decodeData(E data);
 
-    public abstract List<String> encodeData(T data);
+    public abstract String encodeData(T data);
 }

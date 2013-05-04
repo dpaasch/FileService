@@ -1,8 +1,5 @@
 package fileManagement;
 
-import java.io.File;
-
-
 /**
  *
  * @author Dawn Bykowski, dpaasch@my.wctc.edu
@@ -10,7 +7,7 @@ import java.io.File;
  */
 public interface FileWriterStrategy<T> {
     
-    public abstract int writeToFile(T data);
+    public abstract void writeToFile(T data);
     
     public abstract String getFileName();
     
@@ -18,10 +15,6 @@ public interface FileWriterStrategy<T> {
 
     public abstract void setFileName(String fileName);
     
-    public abstract void setFormatter(FormatStrategy formatter);
-    
-    
-    
-    
+    public abstract void setFormatter(FormatStrategy formatter) throws NullPointerException;  
     
 }
