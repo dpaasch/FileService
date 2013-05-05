@@ -101,7 +101,7 @@ public class CsvCommaFormat implements
      * @return the generic data structure used for transport.
      */
     @Override
-    public List<LinkedHashMap<String, String>> decodeData(List<String> data) {
+    public List<LinkedHashMap<String, String>> decodeData(List<String> dataFromSrc) {
         /*
          * This data structure will be used to store the decoded data
          * in a neutral format that can be used by any program. It's main
@@ -113,32 +113,32 @@ public class CsvCommaFormat implements
                 new ArrayList<LinkedHashMap<String, String>>();
 
         String[] headerFields = null;
-        for (int recordNo = 0; recordNo < data.size(); recordNo++) {
-            String firstRow = data.get(recordNo);
-            String[] fields = data.get(recordNo).split(DELIMITER);
+        for (int recordNo = 0; recordNo < dataFromSrc.size(); recordNo++) {
+            String firstRow = dataFromSrc.get(recordNo);
+
+            String[] fields = dataFromSrc.get(recordNo).split(",");
             if (hasHeader && (recordNo == 0)) { // first record may be header
                 headerFields = fields;
-                System.out.println("First if: " + headerFields);
-//                continue;
+                continue;
             }
             LinkedHashMap<String, String> record =
                     new LinkedHashMap<String, String>();
-            for (int i = 1; i < fields.length; i++) {
-                if (!hasHeader && (recordNo == 0)) { // zero is first record, could be header
-                    break; // not a record so skip following code
-                    // because it's a header but has no data values
+            for (int i = 0; i < fields.length; i++) {
+                // if there is a header row we are going to continue processing
+                if (hasHeader && (recordNo == 0)) {
+                    continue; // we took care of this above, thus we now continue
                     // if header included, we store header info as key and data value
                 } else if (hasHeader) {
                     record.put(headerFields[i], fields[i]);
-
                     // if no header we create an artificial key from a counter and add value
                 } else {
                     record.put("" + i, fields[i]);
                 }
             }
-            // Only add the record if it's not the first row (header)
-//            if (recordNo != 0) {
-            if (!hasHeader) {
+            // Add the record if there is not a header row
+            if (hasHeader && recordNo == 1) {
+            } else {
+                // we decode the data and add the record!
                 decodedData.add(record);
             }
         }
