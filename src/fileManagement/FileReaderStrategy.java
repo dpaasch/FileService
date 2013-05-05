@@ -3,42 +3,54 @@ package fileManagement;
 import java.io.IOException;
 
 /**
- *
- * @author tim
+ * The FileReaderStrategy is an interface, providing full abstraction.  It is
+ * responsible for providing common file reader methods for the low-level
+ * classes to utilize (code reuse).
+ * 
+ * @author Dawn Bykowski, dpaasch@my.wctc.edu
+ * @version 1.00
  */
 public interface FileReaderStrategy<T> {
 
     /**
-     * gets the path of the data file that will be read from
+     * Gets the path of the data file that will be read from
      *
-     * @return dataFilePath : path of the file to be read
+     * @return filePath : path of the file to be read
      */
     public abstract String getFilePath();
 
     /**
-     * gets the name of the format strategy to be used
+     * Gets the name of the format strategy to be used
+     *
      * @return formatter : the formatter that is being used
      */
     public abstract FormatStrategy getFormatter();
-
+    
     /**
-     * reads the data file given via the getDataFilePath() method
-     * T is the type of data being read in
-     * @return dataFromFile : data found within the file
-     * @throws IOException : 
+     * Reads the data file given via the getDataFilePath() method. Using a list
+     * because it is a variable-length argument that allows for a variable
+     * number of arguments. The LinkedHashMap allows for a predictable iteration
+     * order, the order in which the data was inserted into the table. T is the
+     * type of data being read in - this means no set type has to be used
+     *
+     * @return data : formatted data from the file being read
+     * @throws IOException
      */
     public abstract T readFile() throws IOException;
 
     /**
-     * sets the path of the data file that will be read from
+     * Sets the path of the data file that will be read from in the form of a
+     * private variable
      *
-     * @param dataFilePath : path of the file to be read
+     * @param filePath : path of the file to be read
      */
     public abstract void setFilePath(String filePath);
 
     /**
-     * sets the format strategy that will be used to read the file
-     * @param formatter : the formatter that is being used 
+     * Sets the format strategy that will be used to read the file in the form
+     * of a private variable
+     *
+     * @param formatter : the formatter that is being used
      */
     public abstract void setFormatter(FormatStrategy formatter);
 }
