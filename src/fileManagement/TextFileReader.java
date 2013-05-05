@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * TxtFileReader is a low-level class that uses the FileReaderStrategy interface
@@ -26,6 +27,8 @@ public class TextFileReader implements
     private boolean hasHeader;
     /* TextFileReader message variables */
     private final String NULL_POINTER = " Error: Value cannot be null";
+    private static final String FILE_OPEN = " Error: File Unavailable for reading. "
+            + "\nIt is currently open and being used by another process";
 
     /**
      * Constructor instantiates the class by setting the dataFilePath and the
@@ -63,8 +66,8 @@ public class TextFileReader implements
                 data.add(line);
                 line = reader.readLine();
             }
-        } catch (IOException e) {
-            e.getCause().getMessage();
+        } catch (IOException ioe) {
+            System.out.println("Data file" + FILE_OPEN);
         } finally {
             if (reader != null) {
                 reader.close();
@@ -131,20 +134,48 @@ public class TextFileReader implements
             System.out.println(TextFileReader.class + "\nFormatter" + NULL_POINTER);
         }
     }
-
+    
+    
     /**
-     * Main - used for testing purposes only
+     * The toString method represents the state of an object
      *
-     * @param args
-     * @throws IOException
+     * @return information about the object
      */
-    public static void main(String[] args) throws IOException {
-        TextFileReader reader =
-                new TextFileReader("C:/NetBeansTemp/ContactList.csv",
-                new CsvCommaFormat(false));
-        List<LinkedHashMap<String, String>> returnData =
-                reader.readFile();
-        System.out.println("Reading file " + reader.getFilePath()
-                + "\n\n" + returnData);
+    @Override
+    public String toString() {
+        return "TextFileReader{" + "formatter=" + formatter + ", "
+                + "reader=" + reader + ", filePath=" + filePath + ", line=" 
+                + line + ", hasHeader=" + hasHeader + '}';
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.filePath);
+        hash = 53 * hash + Objects.hashCode(this.line);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final TextFileReader other = (TextFileReader) obj;
+        if (!Objects.equals(this.filePath, other.filePath)) {
+            return false;
+        }
+        if (!Objects.equals(this.line, other.line)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
+    
+    
+
 }

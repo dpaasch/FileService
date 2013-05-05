@@ -2,6 +2,7 @@ package fileManagement;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,9 +14,9 @@ import java.util.Objects;
 /**
  * The TextFileWriter class is a low-level class that uses the
  * FileWriterStrategy interface to provide a standardized file write method.
- * This class writes to C:/NetBeansTemp with flexibility ONLY in the name 
- * of the file created/written to, entered as a parameter at instantiation
- * of the TextFileWriter.
+ * This class writes to C:/NetBeansTemp with flexibility ONLY in the name of the
+ * file created/written to, entered as a parameter at instantiation of the
+ * TextFileWriter.
  *
  * @author dawn bykowski, dpaasch@my.wctc.edu
  * @version 1.00
@@ -32,7 +33,8 @@ public class TextFileWriter implements
     private boolean append;     // Append data (true) or overwrite (false)
     /* TextFileWriterr message variables */
     private static final String NULL_POINTER = " Error: Value cannot be null";
-    private static final String APPEND = " Warning: Value is set to file overwrite";
+    private static final String FILE_OPEN = " Error: File Unavailable for writing. "
+            + "\nIt is currently open and being used by another process";
 
     /**
      * Constructor instantiates the class by setting the fileName, formatter,
@@ -50,32 +52,33 @@ public class TextFileWriter implements
         setAppend(append);
     }
 
-    /**
-     * Constructor instantiates the class by setting the fileName, and formatter
-     * private variables.
-     *
-     * @param fileName : The file name expressed as a String.
-     * @param formatter : The file format strategy being used.
-     * @param append : The file write status expressed as a boolean.
-     */
-    public TextFileWriter(String fileName, FormatStrategy formatter) {
-        setFileName(fileName);
-        setFormatter(formatter);
-    }
+//    /**
+//     * Constructor instantiates the class by setting the fileName, and formatter
+//     * private variables.
+//     *
+//     * @param fileName : The file name expressed as a String.
+//     * @param formatter : The file format strategy being used.
+//     * @param append : The file write status expressed as a boolean.
+//     */
+//    public TextFileWriter(String fileName, FormatStrategy formatter) {
+//        setFileName(fileName);
+//        setFormatter(formatter);
+//    }
 
     /**
-     * Writes the given data to a text file. Using a list because it is a 
-     * variable-length argument that allows for a variable number of 
-     * arguments. The LinkedHashMap allows for a predictable iteration
-     * order, the order in which the data was inserted into the table. T 
-     * is the type of data being written
+     * Writes the given data to a text file. Using a list because it is a
+     * variable-length argument that allows for a variable number of arguments.
+     * The LinkedHashMap allows for a predictable iteration order, the order in
+     * which the data was inserted into the table. T is the type of data being
+     * written
      *
      * @return data : The data to be written into the file
      * @throws NullPointerException : Thrown if there is no data
-     * @throws IOException
+     * @throws IOException : Thrown if the file is opened by another process
      */
     @Override
-    public void writeToFile(List<LinkedHashMap<String, String>> data) {
+    public void writeToFile(List<LinkedHashMap<String, String>> data) 
+            throws NullPointerException, IOException {
 
         try {
             // if there is no data throw an error
@@ -92,6 +95,7 @@ public class TextFileWriter implements
                 // write the data to the file
                 writer.println(encodedData);
                 System.out.println("Write successful.");
+                System.out.println("Wrote to file: " + dataFile.getAbsoluteFile());
                 writer.close();
             } else {
                 throw new NullPointerException();
@@ -99,13 +103,12 @@ public class TextFileWriter implements
         } catch (NullPointerException npe) {
             System.out.println("Data" + NULL_POINTER);
         } catch (IOException ioe) {
-            System.out.println(ioe.getCause().getMessage());
+            System.out.println("Data file" + FILE_OPEN);
         } finally {
             if (writer != null) {
                 writer.close();
             }
-        }
-        System.out.println("Wrote to file: " + dataFile.getAbsoluteFile());
+        }      
     }
 
     /**
@@ -118,18 +121,18 @@ public class TextFileWriter implements
         if (!dataFile.exists()) {
             System.out.println("Creating file: " + dataFile.getCanonicalPath());
             dataFile.createNewFile();
-        }
+        } 
     }
 
-    /**
-     * Returns the value of the file name received in the form of the private
-     * variable.
-     *
-     * @return filename : The value of the private variable that identifies the
-     * file name.
-     */
-    @Override
-    public String getFileName() {
+/**
+ * Returns the value of the file name received in the form of the private
+ * variable.
+ *
+ * @return filename : The value of the private variable that identifies the file
+ * name.
+ */
+@Override
+        public String getFileName() {
         return fileName;
     }
 
@@ -141,7 +144,7 @@ public class TextFileWriter implements
      * format strategy being used.
      */
     @Override
-    public FormatStrategy getFormatter() {
+        public FormatStrategy getFormatter() {
         return formatter;
     }
 
@@ -152,7 +155,7 @@ public class TextFileWriter implements
      * if no value is passed in.
      */
     @Override
-    public final void setFileName(String fileName) {
+        public final void setFileName(String fileName) {
         try {
             if (fileName != null) {
                 this.fileName = fileName;
@@ -171,7 +174,7 @@ public class TextFileWriter implements
      * format strategy being used.
      */
     @Override
-    public final void setFormatter(FormatStrategy formatter) {
+        public final void setFormatter(FormatStrategy formatter) {
         try {
             if (formatter != null) {
                 this.formatter = formatter;
@@ -203,23 +206,23 @@ public class TextFileWriter implements
      * Set to true = append, and set to false = overwrite.
      */
     public final void setAppend(boolean append) {
-            this.append = append;
+        this.append = append;
     }
 
     /**
      * The toString method represents the state of an object
-     * 
+     *
      * @return information about the object
      */
     @Override
-    public String toString() {
+        public String toString() {
         return "TextFileWriter{" + "dataFile=" + dataFile + ", "
                 + "writer=" + writer + ", formatter=" + formatter + ", "
                 + "fileName=" + fileName + ", append=" + append + '}';
     }
 
     @Override
-    public int hashCode() {
+        public int hashCode() {
         int hash = 7;
         hash = 17 * hash + Objects.hashCode(this.dataFile);
         hash = 17 * hash + Objects.hashCode(this.fileName);
@@ -227,7 +230,7 @@ public class TextFileWriter implements
     }
 
     @Override
-    public boolean equals(Object obj) {
+        public boolean equals(Object obj) {
         if (obj == null) {
             return false;
         }
@@ -242,32 +245,5 @@ public class TextFileWriter implements
             return false;
         }
         return true;
-    }
-    
-    public static void main(String[] args) throws IOException {
-        String fn = "ContactList.csv";
-        CsvCommaFormat formatter = new CsvCommaFormat(false);
-        TextFileWriter writer = new TextFileWriter(fn, formatter, false);
-        // Need to create a linkedHashMap for each row of data to be written
-        LinkedHashMap<String, String> map0 =
-                new LinkedHashMap<String, String>();
-        map0.put("0", "Pam,Tillis,418 Westfield Way,Pewaukee,WI,53072");
-        LinkedHashMap<String, String> map1 =
-                new LinkedHashMap<String, String>();
-        map1.put("1", "Jerry,Reed,419 Westfield Way,Pewaukee,WI,53072");
-        LinkedHashMap<String, String> map2 =
-                new LinkedHashMap<String, String>();
-        map2.put("2", "Clay,Walker,420 Westfield Way,Pewaukee,WI,53072");
-        LinkedHashMap<String, String> map3 =
-                new LinkedHashMap<String, String>();
-        map3.put("3", "Patsy,Cline,421 Westfield Way,Pewaukee,WI,53072");
-        // Pass the map into the list of LinkedHashMap
-        List<LinkedHashMap<String, String>> data =
-                new ArrayList<LinkedHashMap<String, String>>();
-        data.add(map0);
-        data.add(map1);
-        data.add(map2);
-        data.add(map3);
-        writer.writeToFile(data);
     }
 }

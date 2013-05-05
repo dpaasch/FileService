@@ -1,5 +1,7 @@
 package fileManagement;
 
+import java.io.IOException;
+
 /**
  * The FileWriterStrategy is an interface, providing full abstraction.  It is
  * responsible for providing common file writer methods for the low-level
@@ -21,7 +23,8 @@ public interface FileWriterStrategy<T> {
      * @throws NullPointerException : Thrown if there is no data
      * @throws IOException
      */
-    public abstract void writeToFile(T data);
+    public abstract void writeToFile(T data) 
+            throws NullPointerException, IOException;
 
     /**
      * Returns the value of the file name received in the form of the private

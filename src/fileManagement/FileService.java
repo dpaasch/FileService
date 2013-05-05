@@ -1,60 +1,59 @@
 package fileManagement;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 /**
  * File Service is used to manage the reader and writer strategies
  *
  * @author Dawn Bykowski, dpaasch@my.wctc.edu
  * @version 1.00
  */
-public interface FileService {
+public class FileService {
 
-    /* FileService Reader Methods */
-    /**
-     * Gets the path of the data file that will be read from
-     *
-     * @return filePath : path of the file to be read
-     */
-    public abstract String getFilePath();
+    public static void main(String[] args) throws IOException {
+        // Create a new file writer object
+        FileWriterStrategy writer =
+                // set the strategy object, loading the file to be written to
+                new TextFileWriter("ContactList.csv",
+                // set the format strategy object, setting hasHeader value, and
+                // following with append status
+                new CsvCommaFormat(false), true);
+        // Need to create a linkedHashMap for each row of data to be written
+        LinkedHashMap<String, String> map0 =
+                new LinkedHashMap<String, String>();
+        map0.put("0", "Pam,Tillis,418 Westfield Way,Pewaukee,WI,53072");
+        LinkedHashMap<String, String> map1 =
+                new LinkedHashMap<String, String>();
+        map1.put("1", "Jerry,Reed,419 Westfield Way,Pewaukee,WI,53072");
+        LinkedHashMap<String, String> map2 =
+                new LinkedHashMap<String, String>();
+        map2.put("2", "Clay,Walker,420 Westfield Way,Pewaukee,WI,53072");
+        LinkedHashMap<String, String> map3 =
+                new LinkedHashMap<String, String>();
+        map3.put("3", "Patsy,Cline,421 Westfield Way,Pewaukee,WI,53072");
+        // Pass the map into the list of LinkedHashMap
+        List<LinkedHashMap<String, String>> data =
+                new ArrayList<LinkedHashMap<String, String>>();
+        data.add(map0);
+        data.add(map1);
+        data.add(map2);
+        data.add(map3);
+        writer.writeToFile(data);
 
-    /**
-     * Sets the path of the data file that will be read from in the form of a
-     * private variable
-     *
-     * @param filePath : path of the file to be read
-     */
-    public abstract void setFilePath(String filePath);
-
-    /* FileService Writer Methods */
-    /**
-     * Returns the value of the file name received in the form of the private
-     * variable.
-     *
-     * @return filename : The value of the private variable that identifies the
-     * file name.
-     */
-    public abstract String getFileName();
-
-    /**
-     * Sets the value of the private variable for the file name.
-     *
-     * @param fileName : The file name expressed as a String. Defaults to null
-     * if no value is passed in.
-     */
-    public abstract void setFileName(String fileName);
-
-    /* FileService shared Reader/Writer Methods */
-    /**
-     * Gets the name of the format strategy to be used
-     *
-     * @return formatter : the formatter that is being used
-     */
-    public abstract FormatStrategy getFormatter();
-
-    /**
-     * Sets the value of the private variable for the formatter.
-     *
-     * @param formatter : The value of the private variable that identifies the
-     * format strategy being used.
-     */
-    public abstract void setFormatter(FormatStrategy formatter);
+        // Create a new file reader object
+        TextFileReader reader =
+                // set the strategy object, loading the file to be read from
+                new TextFileReader("C:/NetBeansTemp/ContactList.csv",
+                // set the format strategy object, setting hasHeader value
+                new CsvCommaFormat(false));
+        // return the file data as a List<LinkedHashMap<String,String>> from 
+        // a String
+        List<LinkedHashMap<String, String>> returnData =
+                reader.readFile();
+        System.out.println("Reading file " + reader.getFilePath()
+                + "\n\n" + returnData);
+    }
 }
