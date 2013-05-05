@@ -1,6 +1,8 @@
 package fileManagement;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * The FileReaderStrategy is an interface, providing full abstraction.  It is
@@ -44,7 +46,7 @@ public interface FileReaderStrategy<T> {
      *
      * @param filePath : path of the file to be read
      */
-    public abstract void setFilePath(String filePath);
+    public abstract void setFilePath(String filePath) throws NullPointerException;
 
     /**
      * Sets the format strategy that will be used to read the file in the form
@@ -52,5 +54,6 @@ public interface FileReaderStrategy<T> {
      *
      * @param formatter : the formatter that is being used
      */
-    public abstract void setFormatter(FormatStrategy formatter);
+    public abstract void setFormatter(FormatStrategy<List<LinkedHashMap<String, 
+            String>>,List<String>> formatter) throws NullPointerException;
 }

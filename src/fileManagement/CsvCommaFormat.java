@@ -118,12 +118,13 @@ public class CsvCommaFormat implements
             String[] fields = data.get(recordNo).split(DELIMITER);
             if (hasHeader && (recordNo == 0)) { // first record may be header
                 headerFields = fields;
+                System.out.println("First if: " + headerFields);
 //                continue;
             }
             LinkedHashMap<String, String> record =
                     new LinkedHashMap<String, String>();
             for (int i = 1; i < fields.length; i++) {
-                if (hasHeader && (recordNo == 0)) { // zero is first record, could be header
+                if (!hasHeader && (recordNo == 0)) { // zero is first record, could be header
                     break; // not a record so skip following code
                     // because it's a header but has no data values
                     // if header included, we store header info as key and data value
@@ -136,7 +137,8 @@ public class CsvCommaFormat implements
                 }
             }
             // Only add the record if it's not the first row (header)
-            if (recordNo != 0) {
+//            if (recordNo != 0) {
+            if (!hasHeader) {
                 decodedData.add(record);
             }
         }
