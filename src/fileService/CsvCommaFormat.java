@@ -1,4 +1,4 @@
-package fileManagement;
+package fileService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.Set;
  *
  * @author Jim Lombardo, jlombardo@wctc.edu (version 1.00)
  * @author Dawn Bykowski, dpaasch@my.wctc.edu
- * @version 1.01 Added additional method to check for embedded commas, along 
+ * @version 1.01 Added additional method to check for embedded commas, along
  * with adding additional documentation
  */
 public class CsvCommaFormat implements
@@ -46,8 +46,8 @@ public class CsvCommaFormat implements
     /**
      * Encodes data supplied by a program into the CSV format.
      *
-     * @param data - the raw data from a source, where the key is a real
-     * or artificial field name and the value is the data to be stored.
+     * @param data - the raw data from a source, where the key is a real or
+     * artificial field name and the value is the data to be stored.
      * @return the formatted data.
      */
     @Override
@@ -64,6 +64,10 @@ public class CsvCommaFormat implements
         }
         for (int recordNo = 0; recordNo < data.size(); recordNo++) {
             if (fieldNames != null && headerNotSet) {
+                // get a field count, by retrieving the size
+                int endField = fieldNames.size();
+                // count the fields
+                int fieldCount = 1;
                 for (String fieldName : fieldNames) {
                     // check for embedded commas
                     embeddedComma = findEmbeddedComma(fieldName);
@@ -75,14 +79,20 @@ public class CsvCommaFormat implements
                         formattedData.append(fieldName);
                         formattedData.append(QUOTES);
                     }
-                    formattedData.append(fieldName);
-                    formattedData.append(DELIMITER);
+                    // add a delimiter if it's not the end field
+                    if (fieldCount < endField) {
+                        formattedData.append(fieldName);
+                        formattedData.append(DELIMITER);
+                    }
+                    fieldCount++;
                 }
-                // remove trailing comma
-                formattedData.deleteCharAt(formattedData.length() - 1);
+                if (fieldCount < endField) {
+                    // remove trailing comma
+                formattedData.deleteCharAt(formattedData.length() - 1);                
                 formattedData.append(CRLF);
                 addDataValues(data, recordNo, formattedData);
                 headerNotSet = false;
+                }
             } else {
                 addDataValues(data, recordNo, formattedData);
             }
@@ -96,12 +106,12 @@ public class CsvCommaFormat implements
      * Decodes CSV data supplied by a source and stores keys and values in a
      * generic data structure that can be used by most any program.
      *
-     * @param data - the raw data from a source, where each entry
-     * represents one row in the CSV file.
+     * @param data - the raw data from a source, where each entry represents one
+     * row in the CSV file.
      * @return the generic data structure used for transport.
      */
     @Override
-    public List<LinkedHashMap<String, String>> decodeData(List<String> dataFromSrc) {
+    public List<LinkedHashMap<String, String>> decodeData(List<String> data) {
         /*
          * This data structure will be used to store the decoded data
          * in a neutral format that can be used by any program. It's main
@@ -113,10 +123,10 @@ public class CsvCommaFormat implements
                 new ArrayList<LinkedHashMap<String, String>>();
 
         String[] headerFields = null;
-        for (int recordNo = 0; recordNo < dataFromSrc.size(); recordNo++) {
-            String firstRow = dataFromSrc.get(recordNo);
+        for (int recordNo = 0; recordNo < data.size(); recordNo++) {
+            String firstRow = data.get(recordNo);
 
-            String[] fields = dataFromSrc.get(recordNo).split(",");
+            String[] fields = data.get(recordNo).split(",");
             if (hasHeader && (recordNo == 0)) { // first record may be header
                 headerFields = fields;
                 continue;
@@ -132,7 +142,9 @@ public class CsvCommaFormat implements
                     record.put(headerFields[i], fields[i]);
                     // if no header we create an artificial key from a counter and add value
                 } else {
-                    record.put("" + i, fields[i]);
+                    if (!fields[i].isEmpty()) {
+                        record.put("" + i, fields[i]);
+                    }
                 }
             }
             // Add the record if there is not a header row
@@ -147,7 +159,7 @@ public class CsvCommaFormat implements
 
     /**
      * Adds the data after the encode process
-     * 
+     *
      * @param data : The data to be written to the file
      * @param recordNo : A number for each record for tracking purposes
      * @param formattedData : The data after it has been formatted into a String
@@ -237,33 +249,26 @@ public class CsvCommaFormat implements
      */
     @Override
     public String toString() {
-        return "Csv Comma Formatter";
+        return "CsvCommaFormat{" + "hasHeader=" + hasHeader
+                + ", embeddedComma=" + embeddedComma + '}';
     }
-    
-//    public static void main(String[] args) {
-//        FormatStrategy formatter = new CsvCommaFormat(false);
-//         // Need to create a linkedHashMap for each row of data to be written
-//        LinkedHashMap<String, String> map0 =
-//                new LinkedHashMap<String, String>();
-//        map0.put("0", "Pam,Tillis,418 Westfield Way,Pewaukee,WI,53072");
-//        LinkedHashMap<String, String> map1 =
-//                new LinkedHashMap<String, String>();
-//        map1.put("1", "Jerry,Reed,419 Westfield Way,Pewaukee,WI,53072");
-//        LinkedHashMap<String, String> map2 =
-//                new LinkedHashMap<String, String>();
-//        map2.put("2", "Clay,Walker,420 Westfield Way,Pewaukee,WI,53072");
-//        LinkedHashMap<String, String> map3 =
-//                new LinkedHashMap<String, String>();
-//        map3.put("3", "Patsy,Cline,421 Westfield Way,Pewaukee,WI,53072");
-//        // Pass the map into the list of LinkedHashMap
-//        List<LinkedHashMap<String, String>> data =
-//                new ArrayList<LinkedHashMap<String, String>>();
-//        data.add(map0);
-//        data.add(map1);
-//        data.add(map2);
-//        data.add(map3);
-//        
-//        String encodedData = formatter.encodeData(data);
-//        System.out.println(encodedData);        
-//     }
+
+    public static void main(String[] args) {
+        FormatStrategy formatter = new CsvCommaFormat(false);
+        // Need to create a linkedHashMap for each row of data to be written
+        LinkedHashMap<String, String> map0 =
+                new LinkedHashMap<String, String>();
+        map0.put("0", "2.00,2.00");
+        LinkedHashMap<String, String> map1 =
+                new LinkedHashMap<String, String>();
+        map1.put("1", "4.00,5.75");
+        // Pass the map into the list of LinkedHashMap
+        List<LinkedHashMap<String, String>> data =
+                new ArrayList<LinkedHashMap<String, String>>();
+        data.add(map0);
+        data.add(map1);
+
+        String encodedData = formatter.encodeData(data);
+        System.out.println(encodedData);
+    }
 }

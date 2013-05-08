@@ -1,4 +1,4 @@
-package fileManagement;
+package fileService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -102,7 +102,7 @@ public class TextFileReader implements
                 throw new NullPointerException();
             }
         } catch (NullPointerException npe) {
-            System.out.println(TextFileReader.class + "\nDataFilePath" + NULL_POINTER);
+            System.out.println("\nDataFilePath" + NULL_POINTER);
         }
     }
 
@@ -131,11 +131,10 @@ public class TextFileReader implements
                 throw new NullPointerException();
             }
         } catch (NullPointerException npe) {
-            System.out.println(TextFileReader.class + "\nFormatter" + NULL_POINTER);
+            System.out.println("\nFormatter" + NULL_POINTER);
         }
     }
-    
-    
+
     /**
      * The toString method represents the state of an object
      *
@@ -144,7 +143,7 @@ public class TextFileReader implements
     @Override
     public String toString() {
         return "TextFileReader{" + "formatter=" + formatter + ", "
-                + "reader=" + reader + ", filePath=" + filePath + ", line=" 
+                + "reader=" + reader + ", filePath=" + filePath + ", line="
                 + line + ", hasHeader=" + hasHeader + '}';
     }
 
@@ -173,9 +172,19 @@ public class TextFileReader implements
         }
         return true;
     }
-    
-    
-    
-    
 
+    public static void main(String[] args) throws IOException {
+        // Create a new file reader object
+        TextFileReader reader =
+                // set the strategy object, loading the file to be read from
+                new TextFileReader("src/Thrifty.txt",
+                // set the format strategy object, setting hasHeader value
+                new CsvCommaFormat(false));
+        // return the file data as a List<LinkedHashMap<String,String>> from 
+        // a String
+        List<LinkedHashMap<String, String>> returnData =
+                reader.readFile();
+        System.out.println("Reading file " + reader.getFilePath()
+                + "\n\n" + returnData);
+    }
 }
