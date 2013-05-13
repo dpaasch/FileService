@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -274,6 +275,7 @@ public class TextFileWriter<T> implements
      */
 //    public static void main(String[] args) throws IOException {
 //        String fn = "Thrifty.txt";
+//        String fn = "BestValue.txt";
 //        CsvCommaFormat formatter = new CsvCommaFormat(false);
 //        TextFileWriter writer = new TextFileWriter(fn, formatter, false);
 //        // Need to create a linkedHashMap for each row of data to be written

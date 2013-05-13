@@ -207,18 +207,19 @@ public class TextFileReader implements
      *
      * @param args
      */
-//    public static void main(String[] args) throws IOException {
-//        // Create a new file reader object
-//        TextFileReader reader =
-//                // set the strategy object, loading the file to be read from
+    public static void main(String[] args) throws IOException {
+        // Create a new file reader object
+        TextFileReader reader =
+                // set the strategy object, loading the file to be read from
 //                new TextFileReader("src/Thrifty.txt",
-//                // set the format strategy object, setting hasHeader value
-//                new CsvCommaFormat(false));
-//        // return the file data as a List<LinkedHashMap<String,String>> from 
-//        // a String
-//        List<LinkedHashMap<String, String>> returnData =
-//                reader.readFile();
-//        System.out.println("Reading file " + reader.getFilePath()
-//                + "\n\n" + returnData);
-//    }
+                new TextFileReader("src/BestValue.txt",
+                // set the format strategy object, setting hasHeader value
+                new CsvCommaFormat(false));
+        // return the file data as a List<LinkedHashMap<String,String>> from 
+        // a String
+        List<LinkedHashMap<String, String>> returnData =
+                reader.readFile();
+        System.out.println("Reading file " + reader.getFilePath()
+                + "\n\n" + returnData);
+    }
 }
