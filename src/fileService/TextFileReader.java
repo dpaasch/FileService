@@ -19,16 +19,28 @@ public class TextFileReader implements
         FileReaderStrategy<List<LinkedHashMap<String, String>>> {
 
     /* TextFileReader components */
-    private FormatStrategy<List<LinkedHashMap<String, String>>, List<String>> formatter;
+    private FormatStrategy<List<LinkedHashMap<String, String>>, 
+            List<String>> formatter;
     private BufferedReader reader;
-    /* TextFileReader variables */
-    private String filePath;// The path of the file being read from
-    private String line = null;
-    private boolean hasHeader;
+    private OutputStrategy output = new GUIOutput();
     /* TextFileReader message variables */
-    private final String NULL_POINTER = " Error: Value cannot be null";
-    private static final String FILE_OPEN = " Error: File Unavailable for reading. "
+    private static final String NULL_POINTER = " Error: Value cannot be null",
+            FILE_OPEN = " Error: File Unavailable for reading. "
             + "\nIt is currently open and being used by another process";
+    /* TextFileReader variables */
+    private String filePath, // The path of the file being read from
+            line = null;
+    private boolean hasHeader;    
+    // Replacements for magic numbers
+    private static final int INT_ZERO = 0;
+    private static final String CRLF = "\n",
+            COLON = ": ",
+            DATA_FILE = "Data file", 
+            DATA_FILE_PATH = "Data File Path",
+            FORMATTER = "Formatter",
+            READER = "Reader",
+            LINE = "line",
+            HAS_HEADER = "Has Header";
 
     /**
      * Constructor instantiates the class by setting the dataFilePath and the
@@ -38,7 +50,8 @@ public class TextFileReader implements
      * @param formatter : the formatter that is being used
      */
     public TextFileReader(String filePath,
-            FormatStrategy<List<LinkedHashMap<String, String>>, List<String>> formatter) {
+            FormatStrategy<List<LinkedHashMap<String, String>>, 
+                    List<String>> formatter) {
         setFilePath(filePath);
         setFormatter(formatter);
     }
@@ -67,7 +80,7 @@ public class TextFileReader implements
                 line = reader.readLine();
             }
         } catch (IOException ioe) {
-            System.out.println("Data file" + FILE_OPEN);
+            output.outputMessage(DATA_FILE + FILE_OPEN);
         } finally {
             if (reader != null) {
                 reader.close();
@@ -92,17 +105,18 @@ public class TextFileReader implements
      * private variable
      *
      * @param filePath : path of the file to be read
+     * @throws IllegalArgumentException : if filePath parameter = null
      */
     @Override
-    public final void setFilePath(String filePath) throws NullPointerException {
+    public final void setFilePath(String filePath) throws IllegalArgumentException {
         try {
-            if (filePath != null || filePath.length() != 0) {
+            if (filePath != null || filePath.length() != INT_ZERO) {
                 this.filePath = filePath;
             } else {
-                throw new NullPointerException();
+                throw new IllegalArgumentException();
             }
         } catch (NullPointerException npe) {
-            System.out.println("\nDataFilePath" + NULL_POINTER);
+            output.outputMessage(DATA_FILE_PATH + NULL_POINTER);
         }
     }
 
@@ -121,9 +135,11 @@ public class TextFileReader implements
      * of a private variable
      *
      * @param formatter : the formatter that is being used
+     * @throws NullPointerException : if formatter parameter = null
      */
     @Override
-    public final void setFormatter(FormatStrategy<List<LinkedHashMap<String, String>>, List<String>> formatter) throws NullPointerException {
+    public final void setFormatter(FormatStrategy<List<LinkedHashMap<String, 
+            String>>, List<String>> formatter) throws NullPointerException {
         try {
             if (formatter != null) {
                 this.formatter = formatter;
@@ -131,7 +147,7 @@ public class TextFileReader implements
                 throw new NullPointerException();
             }
         } catch (NullPointerException npe) {
-            System.out.println("\nFormatter" + NULL_POINTER);
+            output.outputMessage(FORMATTER + NULL_POINTER);
         }
     }
 
@@ -142,11 +158,17 @@ public class TextFileReader implements
      */
     @Override
     public String toString() {
-        return "TextFileReader{" + "formatter=" + formatter + ", "
-                + "reader=" + reader + ", filePath=" + filePath + ", line="
-                + line + ", hasHeader=" + hasHeader + '}';
+        return "TextFileReader{" + FORMATTER + COLON + formatter + CRLF
+                + READER + reader + CRLF + DATA_FILE_PATH + filePath + CRLF  
+                + LINE + line + HAS_HEADER + hasHeader + '}';
     }
 
+    /**
+     * Returns the hash code value for the object on which this method is
+     * invoked.
+     *
+     * @return hashCode : for filePath and line
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -155,6 +177,13 @@ public class TextFileReader implements
         return hash;
     }
 
+    /**
+     * Checks if some other object passed to it as an argument is equal to the
+     * object on which this method is invoked
+     *
+     * @param obj
+     * @return equals : for filePath and line
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -173,18 +202,23 @@ public class TextFileReader implements
         return true;
     }
 
-    public static void main(String[] args) throws IOException {
-        // Create a new file reader object
-        TextFileReader reader =
-                // set the strategy object, loading the file to be read from
-                new TextFileReader("src/Thrifty.txt",
-                // set the format strategy object, setting hasHeader value
-                new CsvCommaFormat(false));
-        // return the file data as a List<LinkedHashMap<String,String>> from 
-        // a String
-        List<LinkedHashMap<String, String>> returnData =
-                reader.readFile();
-        System.out.println("Reading file " + reader.getFilePath()
-                + "\n\n" + returnData);
-    }
+        /**
+     * Main method used for testing the TextFileReader Class
+     *
+     * @param args
+     */
+//    public static void main(String[] args) throws IOException {
+//        // Create a new file reader object
+//        TextFileReader reader =
+//                // set the strategy object, loading the file to be read from
+//                new TextFileReader("src/Thrifty.txt",
+//                // set the format strategy object, setting hasHeader value
+//                new CsvCommaFormat(false));
+//        // return the file data as a List<LinkedHashMap<String,String>> from 
+//        // a String
+//        List<LinkedHashMap<String, String>> returnData =
+//                reader.readFile();
+//        System.out.println("Reading file " + reader.getFilePath()
+//                + "\n\n" + returnData);
+//    }
 }

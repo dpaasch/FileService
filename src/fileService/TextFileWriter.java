@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -14,8 +13,8 @@ import java.util.Objects;
  * The TextFileWriter class is a low-level class that uses the
  * FileWriterStrategy interface to provide a standardized file write method.
  * This class originally wrote to C:/NetBeansTemp with flexibility ONLY in the
- * name of the file created/written to, entered as a parameter at instantiation 
- * of the TextFileWriter.  It currently writes to the NetBeans src directory.
+ * name of the file created/written to, entered as a parameter at instantiation
+ * of the TextFileWriter. It currently writes to the NetBeans src directory.
  *
  * @author dawn bykowski, dpaasch@my.wctc.edu
  * @version 1.00
@@ -25,15 +24,30 @@ public class TextFileWriter<T> implements
 
     /* TextFileWriter components */
     private File dataFile;
-    private PrintWriter writer;  // The type of writer being used
+    private static PrintWriter writer;  // The type of writer being used
     private FormatStrategy formatter;   // Formatter being used
+    private OutputStrategy output = new GUIOutput();
+    
+    /* TextFileWriterr message variables */
+    private static final String NULL_POINTER = " Error: Value cannot be null",
+            FILE_OPEN = " Error: File Unavailable for writing. "
+            + "\nIt is currently open and being used by another process";
     /* TextFileWriter variables */
     private String fileName;  // File name of the file being written to
     private boolean append;     // Append data (true) or overwrite (false)
-    /* TextFileWriterr message variables */
-    private static final String NULL_POINTER = " Error: Value cannot be null";
-    private static final String FILE_OPEN = " Error: File Unavailable for writing. "
-            + "\nIt is currently open and being used by another process";
+    // Replacements for magic numbers
+    private static final int INT_ZERO = 0;
+    private static final String CRLF = "\n",
+            APPEND = "Append",
+            COLON = ": ",
+            DATA_FILE = "Data file",
+            DATA = "Data",
+            CREATING_FILE = "Creating file: ",
+            WRITE_SUCCESSFUL = "Write successful",
+            WROTE_TO_FILE = "Wrote to file: ",
+            FILE_NAME = "File Name",
+            FORMATTER = "Formatter",
+            WRITER = "Writer";
 
     /**
      * Constructor instantiates the class by setting the fileName, formatter,
@@ -82,17 +96,18 @@ public class TextFileWriter<T> implements
                 // encode the data to be written
                 String encodedData = formatter.encodeData(data);
                 // write the data to the file
-                writer.println(encodedData);
-                System.out.println("Write successful.");
-                System.out.println("Wrote to file: " + dataFile.getAbsoluteFile());
+                writer.print(encodedData);
+                output.outputMessage(WRITE_SUCCESSFUL);
+                output.outputMessage(WROTE_TO_FILE + CRLF 
+                        + dataFile.getAbsoluteFile());
                 writer.close();
             } else {
                 throw new NullPointerException();
             }
         } catch (NullPointerException npe) {
-            System.out.println("Data" + NULL_POINTER);
+            output.outputMessage(DATA + NULL_POINTER);
         } catch (IOException ioe) {
-            System.out.println("Data file" + FILE_OPEN);
+            output.outputMessage(DATA_FILE + FILE_OPEN);
         } finally {
             if (writer != null) {
                 writer.close();
@@ -108,7 +123,7 @@ public class TextFileWriter<T> implements
      */
     public void validateDataFile() throws IOException {
         if (!dataFile.exists()) {
-            System.out.println("Creating file: " + dataFile.getCanonicalPath());
+            output.outputMessage(CREATING_FILE + dataFile.getCanonicalPath());
             dataFile.createNewFile();
         }
     }
@@ -142,9 +157,10 @@ public class TextFileWriter<T> implements
      *
      * @param fileName : The file name expressed as a String. Defaults to null
      * if no value is passed in.
+     * @throws NullPointerException : if fileName parameter = null
      */
     @Override
-    public final void setFileName(String fileName) {
+    public final void setFileName(String fileName) throws NullPointerException{
         try {
             if (fileName != null) {
                 this.fileName = fileName;
@@ -152,7 +168,7 @@ public class TextFileWriter<T> implements
                 throw new NullPointerException();
             }
         } catch (NullPointerException npe) {
-            System.out.println("\nFileName" + NULL_POINTER);
+            output.outputMessage(FILE_NAME + NULL_POINTER);
         }
     }
 
@@ -161,9 +177,11 @@ public class TextFileWriter<T> implements
      *
      * @param formatter : The value of the private variable that identifies the
      * format strategy being used.
+     * @throws NullPointerException : if formatter parameter = null
      */
     @Override
-    public final void setFormatter(FormatStrategy formatter) {
+    public final void setFormatter(FormatStrategy formatter) 
+            throws NullPointerException{
         try {
             if (formatter != null) {
                 this.formatter = formatter;
@@ -171,7 +189,7 @@ public class TextFileWriter<T> implements
                 throw new NullPointerException();
             }
         } catch (NullPointerException npe) {
-            System.out.println("\nFormatter" + NULL_POINTER);
+            output.outputMessage(FORMATTER +NULL_POINTER);
         }
     }
 
@@ -205,11 +223,17 @@ public class TextFileWriter<T> implements
      */
     @Override
     public String toString() {
-        return "TextFileWriter{" + "dataFile=" + dataFile + ", "
-                + "writer=" + writer + ", formatter=" + formatter + ", "
-                + "fileName=" + fileName + ", append=" + append + '}';
+        return "TextFileWriter{" + DATA_FILE + COLON + dataFile + CRLF
+                + WRITER + writer + CRLF + FORMATTER + COLON + formatter + CRLF
+                + FILE_NAME + fileName + APPEND + append + '}';
     }
 
+    /**
+     * Returns the hash code value for the object on which this method is
+     * invoked.
+     *
+     * @return hashCode : for dataFile and fileName
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -218,6 +242,13 @@ public class TextFileWriter<T> implements
         return hash;
     }
 
+    /**
+     * Checks if some other object passed to it as an argument is equal to the
+     * object on which this method is invoked
+     *
+     * @param obj
+     * @return equals : for dataFile and fileName
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -235,24 +266,28 @@ public class TextFileWriter<T> implements
         }
         return true;
     }
-    
-        public static void main(String[] args) throws IOException {
-        String fn = "Thrifty.txt";
-        CsvCommaFormat formatter = new CsvCommaFormat(false);
-        TextFileWriter writer = new TextFileWriter(fn, formatter, false);
-        // Need to create a linkedHashMap for each row of data to be written
-        LinkedHashMap<String, String> map0 =
-                new LinkedHashMap<String, String>();
-        map0.put("0", "2.00,2.00");
-        LinkedHashMap<String, String> map1 =
-                new LinkedHashMap<String, String>();
-        map1.put("1", "9.00,5.00");
-        // Pass the map into the list of LinkedHashMap
-        List<LinkedHashMap<String, String>> data =
-                new ArrayList<LinkedHashMap<String, String>>();
-        data.add(map0);
-        data.add(map1);
 
-        writer.writeToFile(data);
-    }
+    /**
+     * Main method used for testing the TextFileWriter Class
+     *
+     * @param args
+     */
+//    public static void main(String[] args) throws IOException {
+//        String fn = "Thrifty.txt";
+//        CsvCommaFormat formatter = new CsvCommaFormat(false);
+//        TextFileWriter writer = new TextFileWriter(fn, formatter, false);
+//        // Need to create a linkedHashMap for each row of data to be written
+//        LinkedHashMap<String, String> map0 =
+//                new LinkedHashMap<String, String>();
+//        map0.put("0", "2.00,2.00");
+//        LinkedHashMap<String, String> map1 =
+//                new LinkedHashMap<String, String>();
+//        map1.put("1", "9.00,5.00");
+//        // Pass the map into the list of LinkedHashMap
+//        List<LinkedHashMap<String, String>> data =
+//                new ArrayList<LinkedHashMap<String, String>>();
+//        data.add(map0);
+//        data.add(map1);
+//        writer.writeToFile(data);
+//    }
 }

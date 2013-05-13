@@ -26,6 +26,7 @@ public interface FormatStrategy<T, E> {
      * @param data - the raw data from a source, where the key is a real or
      * artificial field name and the value is the data to be stored.
      * @return the formatted data.
+     * @throws NullPointerException
      */
-    public abstract String encodeData(T data);
+    public abstract String encodeData(T data) throws NullPointerException;
 }

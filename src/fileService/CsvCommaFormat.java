@@ -21,18 +21,21 @@ public class CsvCommaFormat implements
         FormatStrategy<List<LinkedHashMap<String, String>>, List<String>> {
 
     /* CsvCommaFormat variables */
-    private static final String CRLF = "\n";
-    private static String DELIMITER = ",";    // File delimiter
-    private static final String QUOTES = "\"";
-    private boolean hasHeader;
-    private boolean embeddedComma;     // Comma embedded in data
-
+    private boolean hasHeader,
+            embeddedComma;     // Comma embedded in data
+    // Replacements for magic numbers
+    private static final String CRLF = "\n",
+            DELIMITER = ",",
+            QUOTES = "\"",
+            COLON = ": ",
+            EMBEDDED_COMMA = "Embedded Comma",
+            DATA = "Data",
+            HAS_HEADER = "Has Header";
+    private static final int INT_ZERO = 0;
     /* CsvCommaFormat message variables */
-    private static final String NULL_POINTER = " Error: Value cannot be null";
-    private static final String ILLEGAL_ARGUMENT = " Error: Value cannot be 0 "
-            + "or less than 0";
-    private static final String INVALID_DELIMITER = " Error: Delimiter must be"
-            + " a comma (,) value";
+    private static final String NULL_POINTER = " Error: Value cannot be null",
+            ILLEGAL_ARGUMENT = " Error: Value cannot be 0 or less than 0",
+            INVALID_DELIMITER = " Error: Delimiter must be a comma (,) value";
 
     /**
      * Custom constructor
@@ -49,20 +52,21 @@ public class CsvCommaFormat implements
      * @param data - the raw data from a source, where the key is a real or
      * artificial field name and the value is the data to be stored.
      * @return the formatted data.
+     * @throws NullPointerException : if data parameter = null
      */
     @Override
     public String encodeData(List<LinkedHashMap<String, String>> data)
             throws NullPointerException {
         if (data == null || data.isEmpty()) {
-            throw new NullPointerException("Data" + NULL_POINTER);
+            throw new NullPointerException(DATA + NULL_POINTER);
         }
         StringBuilder formattedData = new StringBuilder();
         boolean headerNotSet = true;
         Set<String> fieldNames = null;
         if (hasHeader) {
-            fieldNames = data.get(0).keySet();
+            fieldNames = data.get(INT_ZERO).keySet();
         }
-        for (int recordNo = 0; recordNo < data.size(); recordNo++) {
+        for (int recordNo = INT_ZERO; recordNo < data.size(); recordNo++) {
             if (fieldNames != null && headerNotSet) {
                 // get a field count, by retrieving the size
                 int endField = fieldNames.size();
@@ -88,10 +92,10 @@ public class CsvCommaFormat implements
                 }
                 if (fieldCount < endField) {
                     // remove trailing comma
-                formattedData.deleteCharAt(formattedData.length() - 1);                
-                formattedData.append(CRLF);
-                addDataValues(data, recordNo, formattedData);
-                headerNotSet = false;
+//                formattedData.deleteCharAt(formattedData.length() - 1);                
+                    formattedData.append(CRLF);
+                    addDataValues(data, recordNo, formattedData);
+                    headerNotSet = false;
                 }
             } else {
                 addDataValues(data, recordNo, formattedData);
@@ -123,19 +127,19 @@ public class CsvCommaFormat implements
                 new ArrayList<LinkedHashMap<String, String>>();
 
         String[] headerFields = null;
-        for (int recordNo = 0; recordNo < data.size(); recordNo++) {
+        for (int recordNo = INT_ZERO; recordNo < data.size(); recordNo++) {
             String firstRow = data.get(recordNo);
 
             String[] fields = data.get(recordNo).split(",");
-            if (hasHeader && (recordNo == 0)) { // first record may be header
+            if (hasHeader && (recordNo == INT_ZERO)) { // first record may be header
                 headerFields = fields;
                 continue;
             }
             LinkedHashMap<String, String> record =
                     new LinkedHashMap<String, String>();
-            for (int i = 0; i < fields.length; i++) {
+            for (int i = INT_ZERO; i < fields.length; i++) {
                 // if there is a header row we are going to continue processing
-                if (hasHeader && (recordNo == 0)) {
+                if (hasHeader && (recordNo == INT_ZERO)) {
                     continue; // we took care of this above, thus we now continue
                     // if header included, we store header info as key and data value
                 } else if (hasHeader) {
@@ -186,6 +190,7 @@ public class CsvCommaFormat implements
      * @param field : The value of the private variable that identifies the
      * field to be checked
      * @return isEmbeddedComma : A true or false state
+     * @throws IllegalArgumentException :
      */
     public final boolean findEmbeddedComma(String field)
             throws IllegalArgumentException {
@@ -194,7 +199,7 @@ public class CsvCommaFormat implements
         if (fields.length > 1) {
             isEmbeddedComma = true;
         } else if (fields.length <= 0) {
-            throw new IllegalArgumentException("Find Embedded Comma"
+            throw new IllegalArgumentException(EMBEDDED_COMMA
                     + ILLEGAL_ARGUMENT);
         }
         return isEmbeddedComma;
@@ -249,26 +254,69 @@ public class CsvCommaFormat implements
      */
     @Override
     public String toString() {
-        return "CsvCommaFormat{" + "hasHeader=" + hasHeader
-                + ", embeddedComma=" + embeddedComma + '}';
+        return "CsvCommaFormat{" + HAS_HEADER + COLON + hasHeader + CRLF
+                + EMBEDDED_COMMA + embeddedComma + '}';
     }
 
-    public static void main(String[] args) {
-        FormatStrategy formatter = new CsvCommaFormat(false);
-        // Need to create a linkedHashMap for each row of data to be written
-        LinkedHashMap<String, String> map0 =
-                new LinkedHashMap<String, String>();
-        map0.put("0", "2.00,2.00");
-        LinkedHashMap<String, String> map1 =
-                new LinkedHashMap<String, String>();
-        map1.put("1", "4.00,5.75");
-        // Pass the map into the list of LinkedHashMap
-        List<LinkedHashMap<String, String>> data =
-                new ArrayList<LinkedHashMap<String, String>>();
-        data.add(map0);
-        data.add(map1);
-
-        String encodedData = formatter.encodeData(data);
-        System.out.println(encodedData);
+    /**
+     * Returns the hash code value for the object on which this method is
+     * invoked.
+     *
+     * @return hashCode : for hasHeader and embeddedComma
+     */
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + (this.hasHeader ? 1 : 0);
+        hash = 23 * hash + (this.embeddedComma ? 1 : 0);
+        return hash;
     }
+
+    /**
+     * Checks if some other object passed to it as an argument is equal to the
+     * object on which this method is invoked
+     *
+     * @param obj
+     * @return equals : for hasHeader and embeddedComma
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CsvCommaFormat other = (CsvCommaFormat) obj;
+        if (this.hasHeader != other.hasHeader) {
+            return false;
+        }
+        if (this.embeddedComma != other.embeddedComma) {
+            return false;
+        }
+        return true;
+    }
+    /**
+     * Main method used for testing the Car Class
+     *
+     * @param args
+     */
+//    public static void main(String[] args) {
+//        FormatStrategy formatter = new CsvCommaFormat(false);
+//        // Need to create a linkedHashMap for each row of data to be written
+//        LinkedHashMap<String, String> map0 =
+//                new LinkedHashMap<String, String>();
+//        map0.put("0", "2.00,2.00");
+//        LinkedHashMap<String, String> map1 =
+//                new LinkedHashMap<String, String>();
+//        map1.put("1", "4.00,5.75");
+//        // Pass the map into the list of LinkedHashMap
+//        List<LinkedHashMap<String, String>> data =
+//                new ArrayList<LinkedHashMap<String, String>>();
+//        data.add(map0);
+//        data.add(map1);
+//
+//        String encodedData = formatter.encodeData(data);
+//        System.out.println(encodedData);
+//    }
 }

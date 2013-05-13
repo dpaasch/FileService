@@ -45,6 +45,7 @@ public interface FileReaderStrategy<T> {
      * private variable
      *
      * @param filePath : path of the file to be read
+     * @throws IllegalArgumentException : if filePath parameter = null
      */
     public abstract void setFilePath(String filePath) throws NullPointerException;
 
@@ -53,6 +54,7 @@ public interface FileReaderStrategy<T> {
      * of a private variable
      *
      * @param formatter : the formatter that is being used
+     * @throws NullPointerException : if formatter parameter = null
      */
     public abstract void setFormatter(FormatStrategy<List<LinkedHashMap<String, 
             String>>,List<String>> formatter) throws NullPointerException;
